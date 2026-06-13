@@ -1,0 +1,6 @@
+{
+  "name": "Gestión de Producción de Calzado",
+  "description": "Sistema de gestión y control para la producción de calzado, talleres y pedidos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
