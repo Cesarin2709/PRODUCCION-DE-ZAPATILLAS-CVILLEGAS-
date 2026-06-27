@@ -1,0 +1,216 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net: Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Auth helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && (
+        request.auth.token.email_verified == true ||
+        (request.auth.token.email != null && request.auth.token.email.size() > 0)
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.]+$');
+    }
+
+    // Entity-specific validators
+    function isValidPedido(data) {
+      return data.id is string && data.id.size() <= 128
+          && data.codigo is string && data.codigo.size() <= 50
+          && data.fecha is string && data.fecha.size() <= 50
+          && data.semana is int
+          && data.producto is string && data.producto.size() <= 200
+          && data.variantes is int
+          && (data.docenas is int || data.docenas is float)
+          && data.estado is string && data.estado.size() <= 50
+          && data.items is list && data.items.size() <= 100;
+    }
+
+    function isValidVenta(data) {
+      return data.modelo is string && data.modelo.size() <= 200
+          && data.pares is int;
+    }
+
+    function isValidCustomModel(data) {
+      return data.modelo is string && data.modelo.size() <= 200
+          && data.variants is list && data.variants.size() <= 100;
+    }
+
+    function isValidSantosOperation(data) {
+      return data.id is int
+          && data.operario is string && data.operario.size() <= 100
+          && data.area is string && data.area.size() <= 100
+          && data.modelo is string && data.modelo.size() <= 200
+          && data.pieza is string && data.pieza.size() <= 200
+          && (data.precio is int || data.precio is float);
+    }
+
+    function isValidSantosOrder(data) {
+      return data.id is int
+          && data.fecha is string && data.fecha.size() <= 50
+          && data.modelo is string && data.modelo.size() <= 200
+          && (data.docenas is int || data.docenas is float)
+          && (data.total is int || data.total is float)
+          && data.operaciones is list && data.operaciones.size() <= 50
+          && (!('nroOrden' in data) || (data.nroOrden is string && data.nroOrden.size() <= 100))
+          && (!('pares' in data) || (data.pares is int || data.pares is float))
+          && (!('operacion' in data) || (data.operacion is string && data.operacion.size() <= 1000))
+          && (!('pagoCalculado' in data) || (data.pagoCalculado is int || data.pagoCalculado is float));
+    }
+
+    function isValidSantosPayout(data) {
+      return data.periodId is string && data.periodId.size() <= 100
+          && data.paidDate is string && data.paidDate.size() <= 50;
+    }
+
+    function isValidModeloNuevo(data) {
+      return data.id is string && data.id.size() <= 128
+          && data.modelo is string && data.modelo.size() <= 200
+          && data.estado is string && data.estado.size() <= 50
+          && data.inicio is string && data.inicio.size() <= 50
+          && data.fechaest is string && data.fechaest.size() <= 50
+          && data.planta is string && data.planta.size() <= 200
+          && data.entregables is list && data.entregables.size() <= 50
+          && data.created is int;
+    }
+
+    // Rules for each collection
+    match /pedidos/{pedidoId} {
+      allow get: if isVerifiedUser() && isValidId(pedidoId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(pedidoId) && isValidPedido(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(pedidoId) && isValidPedido(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(pedidoId);
+    }
+
+    match /ventasTienda/{ventaId} {
+      allow get: if isVerifiedUser() && isValidId(ventaId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(ventaId) && isValidVenta(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(ventaId) && isValidVenta(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(ventaId);
+    }
+
+    match /customModels/{modelId} {
+      allow get: if isVerifiedUser() && isValidId(modelId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(modelId) && isValidCustomModel(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(modelId) && isValidCustomModel(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(modelId);
+    }
+
+    match /santosOperations/{operationId} {
+      allow get: if isVerifiedUser() && isValidId(operationId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(operationId) && isValidSantosOperation(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(operationId) && isValidSantosOperation(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(operationId);
+    }
+
+    match /destajos_santos/{orderId} {
+      allow get: if isVerifiedUser() && isValidId(orderId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(orderId) && isValidSantosOrder(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(orderId) && isValidSantosOrder(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(orderId);
+    }
+
+    match /santosPayouts/{payoutId} {
+      allow get: if isVerifiedUser() && isValidId(payoutId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(payoutId) && isValidSantosPayout(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(payoutId) && isValidSantosPayout(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(payoutId);
+    }
+
+    match /carlosOperations/{operationId} {
+      allow get: if isVerifiedUser() && isValidId(operationId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(operationId) && isValidSantosOperation(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(operationId) && isValidSantosOperation(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(operationId);
+    }
+
+    match /carlosOrders/{orderId} {
+      allow get: if isVerifiedUser() && isValidId(orderId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(orderId) && isValidSantosOrder(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(orderId) && isValidSantosOrder(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(orderId);
+    }
+
+    match /carlosPayouts/{payoutId} {
+      allow get: if isVerifiedUser() && isValidId(payoutId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(payoutId) && isValidSantosPayout(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(payoutId) && isValidSantosPayout(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(payoutId);
+    }
+
+    match /jonasOperations/{operationId} {
+      allow get: if isVerifiedUser() && isValidId(operationId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(operationId) && isValidSantosOperation(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(operationId) && isValidSantosOperation(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(operationId);
+    }
+
+    match /jonasOrders/{orderId} {
+      allow get: if isVerifiedUser() && isValidId(orderId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(orderId) && isValidSantosOrder(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(orderId) && isValidSantosOrder(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(orderId);
+    }
+
+    match /jonasPayouts/{payoutId} {
+      allow get: if isVerifiedUser() && isValidId(payoutId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(payoutId) && isValidSantosPayout(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(payoutId) && isValidSantosPayout(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(payoutId);
+    }
+
+    match /cristhianOperations/{operationId} {
+      allow get: if isVerifiedUser() && isValidId(operationId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(operationId) && isValidSantosOperation(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(operationId) && isValidSantosOperation(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(operationId);
+    }
+
+    match /cristhianOrders/{orderId} {
+      allow get: if isVerifiedUser() && isValidId(orderId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(orderId) && isValidSantosOrder(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(orderId) && isValidSantosOrder(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(orderId);
+    }
+
+    match /cristhianPayouts/{payoutId} {
+      allow get: if isVerifiedUser() && isValidId(payoutId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(payoutId) && isValidSantosPayout(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(payoutId) && isValidSantosPayout(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(payoutId);
+    }
+
+    match /modelosNuevos/{modeloNuevoId} {
+      allow get: if isVerifiedUser() && isValidId(modeloNuevoId);
+      allow list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(modeloNuevoId) && isValidModeloNuevo(request.resource.data);
+      allow update: if isVerifiedUser() && isValidId(modeloNuevoId) && isValidModeloNuevo(request.resource.data);
+      allow delete: if isVerifiedUser() && isValidId(modeloNuevoId);
+    }
+  }
+}

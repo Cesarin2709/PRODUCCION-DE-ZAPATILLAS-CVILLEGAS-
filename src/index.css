@@ -22,18 +22,184 @@
 
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #f5f5f4; /* light stone grey track to make the scroll container obvious */
+  border-top: 1px solid #e7e5e4;
+  border-bottom: 1px solid #e7e5e4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d6d3d1;
-  border-radius: 0px;
+  background: #a8a29e; /* solid charcoal/stone thumb */
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
+  background: #78716c;
 }
+
+/* Thicker, more prominent horizontal scrollbar for the main table */
+.custom-table-scrollbar::-webkit-scrollbar {
+  height: 14px; /* thick and easy to grab */
+}
+.custom-table-scrollbar::-webkit-scrollbar-track {
+  background: #e7e5e4; /* high-visibility darker background track */
+  border: 1px solid #d6d3d1;
+}
+.custom-table-scrollbar::-webkit-scrollbar-thumb {
+  background: #44403c; /* high-contrast dark thumb */
+  border-radius: 4px;
+}
+.custom-table-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #1c1917; /* even darker on hover for perfect click feedback */
+}
+
+/* High Fidelity Print Styles - Optimized for perfect legibility, clear large text, and complete layouts without truncation */
+@media print {
+  @page {
+    size: landscape;
+    margin: 8mm 8mm;
+  }
+
+  html, body, #root, .flex-1, .h-screen, .min-h-screen, .overflow-y-auto {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-size: 9.5px !important; /* Extremely compact, clear font sizing for print */
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    position: static !important;
+    zoom: 1 !important; /* Ensure browser-level zoom is normalized on print */
+  }
+  
+  /* Hide UI elements not meant for printed paper */
+  .print-hidden,
+  button,
+  input,
+  textarea,
+  select,
+  aside,
+  header,
+  nav,
+  .no-print,
+  #floating-zoom-panel {
+    display: none !important;
+  }
+
+  /* Make sure elements have solid black text on print and no text shadows */
+  h1, h2, h3, h4, h5, h6, th, td, strong, span, p, div, svg {
+    color: #000000 !important;
+    text-shadow: none !important;
+  }
+
+  /* Structural bold elements must be extra bold */
+  h1, h2, h3, h4, th, strong, .font-bold, .font-black {
+    font-weight: 800 !important;
+  }
+
+  /* Remove excessive vertical spacing, margins, and padding on print to compress height */
+  .space-y-8 > :not([hidden]) ~ :not([hidden]),
+  .space-y-6 > :not([hidden]) ~ :not([hidden]),
+  .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 2px !important;
+  }
+
+  .p-6, .p-8, .p-12, .p-4, .pb-4, .pb-6, .py-4, .py-3.5, .px-2.5, .py-2, .px-2 {
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+
+  .mb-1, .mb-2, .mb-4, .mt-1.5, .mt-0.5, .pb-2, .mb-6 {
+    margin-top: 1px !important;
+    margin-bottom: 1px !important;
+    padding-bottom: 1px !important;
+  }
+
+  /* Make table look crisp on paper, maximize width, and prevent column wrapping */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Reset sticky positions on print so headers render correctly and don't end up blank */
+  thead {
+    display: table-header-group !important;
+    position: static !important;
+    width: auto !important;
+    overflow: visible !important;
+  }
+
+  thead tr {
+    display: table-row !important;
+    position: static !important;
+    background-color: #d1d5db !important; /* Force a solid light gray background for printed table headers */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Compact padding and clean sizes for table headers and cells */
+  th, td {
+    border: 1px solid #000000 !important; /* Clear, solid black borders */
+    color: #000000 !important;
+    padding: 3px 4px !important; /* Extremely tight padding for highly compact report */
+    background-color: transparent !important;
+    font-size: 9px !important; /* Clear, compact text size for printing */
+    line-height: 1.15 !important;
+    word-break: normal !important;
+    overflow: visible !important;
+    position: static !important; /* Reset sticky or relative positions */
+  }
+
+  /* Force table header text to be extremely clear, bold, and visible on printed paper */
+  thead th {
+    color: #000000 !important;
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    background-color: #d1d5db !important; /* Light gray shading for high contrast */
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    position: static !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Prevent truncation (such as the truncate class) on all elements in print so names aren't cut off */
+  .truncate, thead th span, thead th div, thead th p, td span, td div {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: none !important;
+    width: auto !important;
+    background-color: transparent !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+  }
+
+  /* Expand layout to fit paper page and reset all height/scrolling limits in print for wrappers */
+  main, .max-w-7xl, .container, .w-full, section, article, .custom-table-scrollbar, .overflow-x-auto, .overflow-y-auto {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    position: static !important;
+  }
+}
+
 
 

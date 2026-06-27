@@ -1,0 +1,176 @@
+{
+  "entities": {
+    "Pedido": {
+      "title": "Pedido",
+      "description": "Production and sales order for shoes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codigo": { "type": "string" },
+        "fecha": { "type": "string" },
+        "semana": { "type": "integer" },
+        "vendedor": { "type": "string" },
+        "producto": { "type": "string" },
+        "variantes": { "type": "integer" },
+        "docenas": { "type": "number" },
+        "estado": { "type": "string" },
+        "items": { "type": "array" },
+        "tejidoFecha": { "type": "string" },
+        "plantaFecha": { "type": "string" },
+        "habilitadoFecha": { "type": "string" },
+        "aparadoFecha": { "type": "string" },
+        "montajeFecha": { "type": "string" }
+      },
+      "required": ["id", "codigo", "fecha", "semana", "producto", "variantes", "docenas", "estado", "items"]
+    },
+    "Venta": {
+      "title": "Venta",
+      "description": "Retail sales for a specific model",
+      "type": "object",
+      "properties": {
+        "modelo": { "type": "string" },
+        "pares": { "type": "integer" }
+      },
+      "required": ["modelo", "pares"]
+    },
+    "CustomModel": {
+      "title": "CustomModel",
+      "description": "Custom model variant colors added dynamically",
+      "type": "object",
+      "properties": {
+        "modelo": { "type": "string" },
+        "variants": { "type": "array" }
+      },
+      "required": ["modelo", "variants"]
+    },
+    "SantosOperation": {
+      "title": "SantosOperation",
+      "description": "Operations and piece rates defined for Santos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "operario": { "type": "string" },
+        "area": { "type": "string" },
+        "modelo": { "type": "string" },
+        "pieza": { "type": "string" },
+        "precio": { "type": "number" }
+      },
+      "required": ["id", "operario", "area", "modelo", "pieza", "precio"]
+    },
+    "SantosOrder": {
+      "title": "SantosOrder",
+      "description": "Santos production batch orders registered",
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "fecha": { "type": "string" },
+        "modelo": { "type": "string" },
+        "docenas": { "type": "number" },
+        "total": { "type": "number" },
+        "operaciones": { "type": "array" },
+        "nroOrden": { "type": "string" },
+        "pares": { "type": "number" },
+        "operacion": { "type": "string" },
+        "pagoCalculado": { "type": "number" }
+      },
+      "required": ["id", "fecha", "modelo", "docenas", "total", "operaciones"]
+    },
+    "SantosPayout": {
+      "title": "SantosPayout",
+      "description": "Payout period statuses and payments completed for Santos",
+      "type": "object",
+      "properties": {
+        "periodId": { "type": "string" },
+        "paidDate": { "type": "string" }
+      },
+      "required": ["periodId", "paidDate"]
+    },
+    "ModeloNuevo": {
+      "title": "ModeloNuevo",
+      "description": "New model designs and their tracking workflow",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "modelo": { "type": "string" },
+        "estado": { "type": "string" },
+        "inicio": { "type": "string" },
+        "fechaest": { "type": "string" },
+        "fin": { "type": "string" },
+        "planta": { "type": "string" },
+        "imgPlanta": { "type": "string" },
+        "imgCap": { "type": "string" },
+        "entregables": { "type": "array" },
+        "comentarios": { "type": "string" },
+        "motivo": { "type": "string" },
+        "created": { "type": "number" }
+      },
+      "required": ["id", "modelo", "estado", "inicio", "fechaest", "planta", "entregables", "created"]
+    }
+  },
+  "firestore": {
+    "pedidos": {
+      "schema": "Pedido",
+      "description": "Stores production and sales orders"
+    },
+    "ventasTienda": {
+      "schema": "Venta",
+      "description": "Stores sold units per shoe model"
+    },
+    "customModels": {
+      "schema": "CustomModel",
+      "description": "Stores custom shoe models and their colors"
+    },
+    "santosOperations": {
+      "schema": "SantosOperation",
+      "description": "Stores Santos's standard piece work pricing table"
+    },
+    "destajos_santos": {
+      "schema": "SantosOrder",
+      "description": "Stores the production orders registered for Santos"
+    },
+    "santosPayouts": {
+      "schema": "SantosPayout",
+      "description": "Stores the payouts made to Santos"
+    },
+    "carlosOperations": {
+      "schema": "SantosOperation",
+      "description": "Stores Carlos's standard piece work pricing table"
+    },
+    "carlosOrders": {
+      "schema": "SantosOrder",
+      "description": "Stores the production orders registered for Carlos"
+    },
+    "carlosPayouts": {
+      "schema": "SantosPayout",
+      "description": "Stores the payouts made to Carlos"
+    },
+    "jonasOperations": {
+      "schema": "SantosOperation",
+      "description": "Stores Jonas's standard piece work pricing table"
+    },
+    "jonasOrders": {
+      "schema": "SantosOrder",
+      "description": "Stores the production orders registered for Jonas"
+    },
+    "jonasPayouts": {
+      "schema": "SantosPayout",
+      "description": "Stores the payouts made to Jonas"
+    },
+    "cristhianOperations": {
+      "schema": "SantosOperation",
+      "description": "Stores Cristhian's standard piece work pricing table"
+    },
+    "cristhianOrders": {
+      "schema": "SantosOrder",
+      "description": "Stores the production orders registered for Cristhian"
+    },
+    "cristhianPayouts": {
+      "schema": "SantosPayout",
+      "description": "Stores the payouts made to Cristhian"
+    },
+    "modelosNuevos": {
+      "schema": "ModeloNuevo",
+      "description": "Stores the track status for designing and launching new models"
+    }
+  }
+}
